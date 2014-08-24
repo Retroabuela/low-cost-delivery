@@ -10,7 +10,10 @@ Main.Boot.prototype = {
 	},
 
 	create : function() {
-     	var style = { font: "24px Arial", fill: "#fff", align: "center" };
+     	var style = { font: "30px Arial", fill: "#fff", align: "center" };
+		this.game.add.text(300 - 130, 400 - 150, "Low-cost Delivery", style);
+
+		style = { font: "24px Arial", fill: "#fff", align: "center" };			
      	this.game.add.text(this.game.world.centerX - 150, 750, "Press the spacebar to start", style);
 
      	startButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);

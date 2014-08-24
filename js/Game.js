@@ -22,7 +22,7 @@ Game.prototype = {
 
 	create : function() {
 		fuelCapacity = 100;
-		this.game.world.setBounds(0 , 0, 600, 3200);
+		this.game.world.setBounds(-300 , 0, 1200, 3200);
 		this.game.physics.startSystem(Phaser.Physics.P2JS);
 		//this.game.physics.p2.defaultRestitution = 0.8;
 		this.game.physics.p2.setBoundsToWorld(true, true, true, true, false);
@@ -31,9 +31,9 @@ Game.prototype = {
    		this.starfield.fixedToCamera = true;
 
 		//Bitmap data to print things
-		this.bmd = this.game.add.bitmapData(600, 3200);
+		this.bmd = this.game.add.bitmapData(1200, 3200);
 		this.bmd.context.fillStyle = '#ffffff';
-		this.game.add.sprite(0, 0, this.bmd);
+		this.game.add.sprite(-300, 0, this.bmd);
 
 		this.ship = this.game.add.sprite(300, 3150,'ship');
 		this.game.physics.p2.enable(this.ship, false);
@@ -44,17 +44,34 @@ Game.prototype = {
 
 		this.planets = this.game.add.group();
 		planet1 = this.planets.create(150, 2800, 'planet-1');
-		planet2 = this.planets.create(450, 2500, 'planet-2');
+		planet2 = this.planets.create(450, 2400, 'planet-2');
+		planet3 = this.planets.create(235, 2000, 'planet-4');
+		planet4 = this.planets.create(400, 1700, 'planet-3');
+		//Asteroid belt
+		planet5 = this.planets.create(430, 1020, 'planet-1');
+		//another asteroid
+		planet6 = this.planets.create(135, 800, 'planet-3');
+		planet7 = this.planets.create(365, 500, 'planet-2');
 
-		this.game.physics.p2.enable([planet1, planet2]);
+		this.game.physics.p2.enable([planet1, planet2, planet3, planet4, planet5, planet6, planet7]);
 
 		planet1.body.static = true;
 		planet2.body.static = true;
+		planet3.body.static = true;
+		planet4.body.static = true;
+		planet5.body.static = true;
+		planet6.body.static = true;
+		planet7.body.static = true;
 
 		//Array of rotation force for each planet
 		this.rotationForce = {};
 		this.rotationForce[planet1.body.id] = -.25;
 		this.rotationForce[planet2.body.id] = .35;
+		this.rotationForce[planet3.body.id] = .55;
+		this.rotationForce[planet4.body.id] = .40;
+		this.rotationForce[planet5.body.id] = -.10;
+		this.rotationForce[planet6.body.id] = .15;
+		this.rotationForce[planet7.body.id] = -.20;
 
 		//Draw planet orbit
 	    this.planets.forEach(this.drawPlanetOrbit, this);
@@ -62,16 +79,21 @@ Game.prototype = {
 
 	    //Create some asteroids
 	    this.asteroids = this.game.add.group();
-	    asteroid1 = this.asteroids.create(2, 2200, 'asteroid-1');
-	    asteroid2 = this.asteroids.create(42, 2000, 'asteroid-3');
-	    asteroid3 = this.asteroids.create(500, 1993, 'asteroid-2');
+	    asteroid1 = this.asteroids.create(2, 1500, 'asteroid-1');
+	    asteroid2 = this.asteroids.create(42, 1360, 'asteroid-3');
+	    asteroid3 = this.asteroids.create(500, 850, 'asteroid-2');
 
 	    this.game.physics.p2.enable([asteroid1, asteroid2, asteroid3]);
 
+	    asteroid1.body.kinematic = true;
+	    asteroid2.body.kinematic = true;
+	    asteroid3.body.kinematic = true;
+
+	    asteroid1.body.moveLeft(45);
+	    asteroid2.body.moveRight(60);
+	    asteroid3.body.moveLeft(100);
+
 	    //Add the HUD layer
-	    //this.hud = this.game.add.bitmapData(600, 800);
-	    //this.hud.context.fillStyle = '#fff';
-	    //this.game.add.sprite(0,0, this.hud);
 	    var style = {font: "30px Arial", fill: "#fff"};
 	    var text = this.game.add.text(410, 750, "Esc - Restart", style);
 	    text.fixedToCamera = true;
@@ -119,7 +141,7 @@ Game.prototype = {
 	    		this.fuelIndicator.drawRect(560, 10 + consumedBar, 15, 210 - consumedBar);
 			}
 			else {
-				this.outOfFuel();
+				//this.outOfFuel();
 			}
 		}
 
@@ -137,7 +159,7 @@ Game.prototype = {
 
 	    //Draw trajectory line
 	    this.bmd.context.fillStyle = '#ffff00';
-	    this.bmd.context.fillRect(this.ship.body.x, this.ship.body.y, 2, 2);
+	    this.bmd.context.fillRect(this.ship.body.x + 300, this.ship.body.y, 2, 2);
 	    this.bmd.dirty = true;
 	},
 
@@ -176,7 +198,7 @@ Game.prototype = {
 		this.bmd.context.strokeStyle = '#FF0000';
 		this.bmd.context.lineWidth = 1;
 		this.bmd.context.beginPath();
-		this.bmd.context.arc(planet.position.x, planet.position.y, (planet.width/2)*3, 0, Math.PI*2);
+		this.bmd.context.arc(planet.position.x + 300, planet.position.y, (planet.width/2)*3, 0, Math.PI*2);
 		this.bmd.context.stroke();
 	},
 
