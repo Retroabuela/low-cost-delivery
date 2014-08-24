@@ -19,6 +19,7 @@ Game.prototype = {
 		this.load.image('station','assets/station.png');
 
 		this.load.physics('physicsData', 'assets/physics/object-shapes.json');
+		this.load.physics('stationPhysics', 'assets/physics/station.json');
 		//this.load.audio('rocket', 'assets/audio/rocket.wav');
 	},
 
@@ -121,7 +122,14 @@ Game.prototype = {
 	    asteroid2 = this.asteroids.create(142, 1360, 'asteroid-3');
 	    asteroid3 = this.asteroids.create(750, 850, 'asteroid-2');
 
-	    this.game.physics.p2.enable([asteroid1, asteroid2, asteroid3]);
+	    this.game.physics.p2.enable([asteroid1, asteroid2, asteroid3], false);
+
+	    asteroid1.body.clearShapes();
+		asteroid1.body.loadPolygon('physicsData', 'asteroid1');
+		asteroid2.body.clearShapes();
+		asteroid2.body.loadPolygon('physicsData', 'asteroid3');
+		asteroid3.body.clearShapes();
+		asteroid3.body.loadPolygon('physicsData', 'asteroid2');
 
 	    asteroid1.body.setCollisionGroup(this.asteroidsCollision);
 	    asteroid2.body.setCollisionGroup(this.asteroidsCollision);
@@ -145,6 +153,8 @@ Game.prototype = {
 		station = this.game.add.sprite(75, 135, 'station');
 		this.game.physics.p2.enable(station, false);
 		station.body.static = true;
+		station.body.clearShapes();
+		station.body.loadPolygon('stationPhysics', 'station');
 		station.body.setCollisionGroup(this.stationCollision);
 		station.body.collides(this.shipCollision, this.arrivesStation, this);
 
@@ -283,6 +293,6 @@ Game.prototype = {
 	},
 
 	outOfFuel: function() {
-		//this.state.start('Main.GameOver');
+		this.state.start('Main.GameOver');
 	} 
 };
