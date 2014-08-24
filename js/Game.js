@@ -2,10 +2,12 @@ var Game = {};
 
 Game = function(game) {
 	this.game = game;
+	this.fuelCapacity = 100;
 };
 
 Game.prototype = {
 	preload : function() {
+		this.load.image('fuel','assets/fuelIcon.png');
 		this.load.image('planet-1','assets/planet1.png');
 		this.load.image('planet-2','assets/planet2.png');
 		this.load.image('planet-3','assets/planet3.png');
@@ -64,6 +66,15 @@ Game.prototype = {
 	    var text = this.game.add.text(450, 750, "r - Restart", style);
 	    text.fixedToCamera = true;
 
+	    //Fuel indicator
+	    fuelIcon = this.game.add.sprite(550, 220, 'fuel');
+	    fuelIcon.fixedToCamera = true;
+	    
+	    this.fuelIndicator = this.game.add.graphics(0,0);
+	    this.fuelIndicator.fixedToCamera = true;
+	    this.fuelIndicator.beginFill(0x00FF00, 1);
+	    this.fuelIndicator.drawRect(560, 10, 15, 210);
+
 		this.cursors = this.game.input.keyboard.createCursorKeys();
 		restartButton = this.game.input.keyboard.addKey(Phaser.Keyboard.R);
 		restartButton.onDown.add(this.restart, this);
@@ -83,6 +94,20 @@ Game.prototype = {
 
 		if(this.cursors.up.isDown) {
 			this.ship.body.thrust(200);
+			
+			if (this.fuelCapacity > 0) {
+				this.fuelCapacity -= 1;
+				
+				this.fuelIndicator.clear();
+				red = (this.fuelCapacity > 50)? (1 - 2*(this.fuelCapacity-50)/100)*255 : 255;
+				green = (this.fuelCapacity > 50)? 255 : (2*(this.fuelCapacity)/100)*255;
+				color = Phaser.Color.RGBtoString(red, green, 0);
+				console.log(color);
+				this.fuelIndicator.beginFill(color.replace('#','0x'), 1);
+				consumedBar = (1 - (this.fuelCapacity/100))*210;
+
+	    		this.fuelIndicator.drawRect(560, 10 + consumedBar, 15, 210 - consumedBar);
+			}
 		}
 
 		//Handle background moving
@@ -143,7 +168,6 @@ Game.prototype = {
 	},
 
 	restart: function() {
-		console.log('hey, listen!');
 		this.state.restart();
 	},
 };
