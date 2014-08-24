@@ -47,11 +47,26 @@ Game.prototype = {
 		planet1.body.static = true;
 		planet2.body.static = true;
 
+		//Array of rotation force for each planet
+		this.rotationForce = {};
+		this.rotationForce[planet1.body.id] = -.25;
+		this.rotationForce[planet2.body.id] = .35;
+
 		//Draw planet orbit
 	    this.planets.forEach(this.drawPlanetOrbit, this);
 	    this.bmd.dirty = true;
 
+	    //Add the HUD layer
+	    //this.hud = this.game.add.bitmapData(600, 800);
+	    //this.hud.context.fillStyle = '#fff';
+	    //this.game.add.sprite(0,0, this.hud);
+	    var style = {font: "30px Arial", fill: "#fff"};
+	    var text = this.game.add.text(450, 750, "r - Restart", style);
+	    text.fixedToCamera = true;
+
 		this.cursors = this.game.input.keyboard.createCursorKeys();
+		restartButton = this.game.input.keyboard.addKey(Phaser.Keyboard.R);
+		restartButton.onDown.add(this.restart, this);
 	},
 
 	update : function() {
@@ -104,10 +119,9 @@ Game.prototype = {
 			Phaser.Point.add(planetDistanceVector, shipCenter, planetDistanceVector);
 			Phaser.Point.subtract(planetDistanceVector, center, planetDistanceVector);
 
-			//Add some sort of rotation here
+			//Add some sort of rotation here (This is a workaround, fix with actual physics)
 			//
-			rotation = -.25;
-			perpend = Phaser.Point.multiplyAdd(new Phaser.Point(), Phaser.Point.rperp(planetDistanceVector), rotation);
+			perpend = Phaser.Point.multiplyAdd(new Phaser.Point(), Phaser.Point.rperp(planetDistanceVector), this.rotationForce[planet.body.id]);
 			//
 
 			planetDistanceVector = Phaser.Point.negative(planetDistanceVector);
@@ -126,5 +140,10 @@ Game.prototype = {
 		this.bmd.context.beginPath();
 		this.bmd.context.arc(planet.position.x, planet.position.y, (planet.width/2)*3, 0, Math.PI*2);
 		this.bmd.context.stroke();
+	},
+
+	restart: function() {
+		console.log('hey, listen!');
+		this.state.restart();
 	},
 };
