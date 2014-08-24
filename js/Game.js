@@ -14,7 +14,7 @@ Game.prototype = {
 		this.load.image('asteroid-1','assets/asteroid1.png');
 		this.load.image('asteroid-2','assets/asteroid2.png');
 		this.load.image('asteroid-3','assets/asteroid3.png');
-		this.load.image('stars', 'assets/starfield.jpg');
+		this.load.image('stars', 'assets/starfield.png');
 		this.load.image('ship','assets/ship.png');
 
 		this.load.physics('physicsData', 'assets/physics/object-shapes.json');
