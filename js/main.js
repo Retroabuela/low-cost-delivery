@@ -2,7 +2,7 @@ var Main = {};
 
 Main.Boot = function(game) {
 	this.game = game;
-}
+};
 
 Main.Boot.prototype = {
 	preload : function() {
@@ -10,13 +10,35 @@ Main.Boot.prototype = {
 	},
 
 	create : function() {
- 		var text = "Hello with Phaser";
-    	var style = { font: "25px Arial", fill: "#ff0000", align: "center" };
+     	var style = { font: "24px Arial", fill: "#fff", align: "center" };
+     	this.game.add.text(this.game.world.centerX - 150, 750, "Press the spacebar to start", style);
 
-    	var t = this.game.add.text(this.game.world.centerX, 0, text, style);
+     	startButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+		startButton.onDown.add(this.startGame, this);
 	},
 
-	update : function() {
+	startGame: function() {
+		this.state.start('Game');
+	}
+};
 
+Main.GameOver = function(game) {};
+
+Main.GameOver.prototype = {
+	create: function() {
+     	if (fuelCapacity === 0) {
+     		style = { font: "30px Arial", fill: "#fff", align: "center" };
+			this.game.add.text(300 - 130, 400 - 150, "Rocket fuel burns fast.\nUse it wisely.", style);
+     	}
+
+		style = { font: "24px Arial", fill: "#fff", align: "center" };
+     	this.game.add.text(300 - 165, 750, "Press the spacebar to try again", style);
+
+     	startButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+		startButton.onDown.add(this.restartGame, this);
 	},
-}
+
+	restartGame: function() {
+		this.state.start('Game');
+	}
+};

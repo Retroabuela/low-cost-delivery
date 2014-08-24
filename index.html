@@ -4,15 +4,19 @@
 	<title>Planet Express</title>
 	<script src="js/phaser.min.js"></script>
 	<script src="js/Game.js"></script>
-	<script src="js/main.js"></script>
+	<script src="js/Main.js"></script>
 </head>
 <body>
 	<script type="text/javascript">
+	var fuelCapacity;
+	//var impact;
+	//
 	function boot() {
 		var game = new Phaser.Game(600, 800);
 
-		//game.state.add('boot', Main.Boot, true);
-		game.state.add('boot', Game, true);
+		game.state.add('Boot', Main.Boot, true);
+		game.state.add('Game', Game);
+		game.state.add('Main.GameOver', Main.GameOver);
 		//Add more states here
 	}
 

@@ -2,7 +2,6 @@ var Game = {};
 
 Game = function(game) {
 	this.game = game;
-	this.fuelCapacity = 100;
 };
 
 Game.prototype = {
@@ -20,6 +19,7 @@ Game.prototype = {
 	},
 
 	create : function() {
+		fuelCapacity = 100;
 		this.game.world.setBounds(0 , 0, 600, 3200);
 		this.game.physics.startSystem(Phaser.Physics.P2JS);
 		//this.game.physics.p2.defaultRestitution = 0.8;
@@ -95,18 +95,21 @@ Game.prototype = {
 		if(this.cursors.up.isDown) {
 			this.ship.body.thrust(200);
 			
-			if (this.fuelCapacity > 0) {
-				this.fuelCapacity -= 1;
+			if (fuelCapacity > 0) {
+				fuelCapacity -= 1;
 				
 				this.fuelIndicator.clear();
-				red = (this.fuelCapacity > 50)? (1 - 2*(this.fuelCapacity-50)/100)*255 : 255;
-				green = (this.fuelCapacity > 50)? 255 : (2*(this.fuelCapacity)/100)*255;
+				red = (fuelCapacity > 50)? (1 - 2*(fuelCapacity-50)/100)*255 : 255;
+				green = (fuelCapacity > 50)? 255 : (2*(fuelCapacity)/100)*255;
 				color = Phaser.Color.RGBtoString(red, green, 0);
-				console.log(color);
+				//console.log(color);
 				this.fuelIndicator.beginFill(color.replace('#','0x'), 1);
-				consumedBar = (1 - (this.fuelCapacity/100))*210;
+				consumedBar = (1 - (fuelCapacity/100))*210;
 
 	    		this.fuelIndicator.drawRect(560, 10 + consumedBar, 15, 210 - consumedBar);
+			}
+			else {
+				this.outOfFuel();
 			}
 		}
 
@@ -170,4 +173,8 @@ Game.prototype = {
 	restart: function() {
 		this.state.restart();
 	},
+
+	outOfFuel: function() {
+		this.state.start('Main.GameOver');
+	} 
 };
