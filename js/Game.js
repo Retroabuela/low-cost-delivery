@@ -18,11 +18,16 @@ Game.prototype = {
 		this.load.image('ship','assets/ship.png');
 
 		this.load.physics('physicsData', 'assets/physics/object-shapes.json');
+		//this.load.audio('rocket', 'assets/audio/rocket.wav');
 	},
 
 	create : function() {
 		fuelCapacity = 100;
-		this.game.world.setBounds(-300 , 0, 1200, 3200);
+
+		//this.rocketSound = this.game.add.audio('rocket');
+		//this.rocketSound.volume = 0.2;
+
+		this.game.world.setBounds(-100 , 0, 800, 3200);
 		this.game.physics.startSystem(Phaser.Physics.P2JS);
 		//this.game.physics.p2.defaultRestitution = 0.8;
 		this.game.physics.p2.setBoundsToWorld(true, true, true, true, false);
@@ -31,9 +36,9 @@ Game.prototype = {
    		this.starfield.fixedToCamera = true;
 
 		//Bitmap data to print things
-		this.bmd = this.game.add.bitmapData(1200, 3200);
+		this.bmd = this.game.add.bitmapData(800, 3200);
 		this.bmd.context.fillStyle = '#ffffff';
-		this.game.add.sprite(-300, 0, this.bmd);
+		this.game.add.sprite(-100, 0, this.bmd);
 
 		this.ship = this.game.add.sprite(300, 3150,'ship');
 		this.game.physics.p2.enable(this.ship, false);
@@ -45,7 +50,7 @@ Game.prototype = {
 		this.planets = this.game.add.group();
 		planet1 = this.planets.create(150, 2800, 'planet-1');
 		planet2 = this.planets.create(450, 2400, 'planet-2');
-		planet3 = this.planets.create(235, 2000, 'planet-4');
+		planet3 = this.planets.create(215, 2000, 'planet-4');
 		planet4 = this.planets.create(400, 1700, 'planet-3');
 		//Asteroid belt
 		planet5 = this.planets.create(430, 1020, 'planet-1');
@@ -79,9 +84,9 @@ Game.prototype = {
 
 	    //Create some asteroids
 	    this.asteroids = this.game.add.group();
-	    asteroid1 = this.asteroids.create(2, 1500, 'asteroid-1');
-	    asteroid2 = this.asteroids.create(42, 1360, 'asteroid-3');
-	    asteroid3 = this.asteroids.create(500, 850, 'asteroid-2');
+	    asteroid1 = this.asteroids.create(550, 1500, 'asteroid-1');
+	    asteroid2 = this.asteroids.create(142, 1360, 'asteroid-3');
+	    asteroid3 = this.asteroids.create(750, 850, 'asteroid-2');
 
 	    this.game.physics.p2.enable([asteroid1, asteroid2, asteroid3]);
 
@@ -89,9 +94,9 @@ Game.prototype = {
 	    asteroid2.body.kinematic = true;
 	    asteroid3.body.kinematic = true;
 
-	    asteroid1.body.moveLeft(45);
-	    asteroid2.body.moveRight(60);
-	    asteroid3.body.moveLeft(100);
+	    asteroid1.body.velocity.x = -130;
+	    asteroid2.body.velocity.x = 100;
+	    asteroid3.body.velocity.x = -250;
 
 	    //Add the HUD layer
 	    var style = {font: "30px Arial", fill: "#fff"};
@@ -110,6 +115,8 @@ Game.prototype = {
 		this.cursors = this.game.input.keyboard.createCursorKeys();
 		restartButton = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
 		restartButton.onDown.add(this.restart, this);
+
+		this.game.time.events.loop(Phaser.Timer.SECOND * 5, this.changeAsteroidDirection, this);
 	},
 
 	update : function() {
@@ -125,6 +132,7 @@ Game.prototype = {
 		}
 
 		if(this.cursors.up.isDown) {
+			//this.rocketSound.play();
 			this.ship.body.thrust(200);
 			
 			if (fuelCapacity > 0) {
@@ -141,7 +149,7 @@ Game.prototype = {
 	    		this.fuelIndicator.drawRect(560, 10 + consumedBar, 15, 210 - consumedBar);
 			}
 			else {
-				//this.outOfFuel();
+				this.outOfFuel();
 			}
 		}
 
@@ -159,7 +167,7 @@ Game.prototype = {
 
 	    //Draw trajectory line
 	    this.bmd.context.fillStyle = '#ffff00';
-	    this.bmd.context.fillRect(this.ship.body.x + 300, this.ship.body.y, 2, 2);
+	    this.bmd.context.fillRect(this.ship.body.x + 100, this.ship.body.y, 2, 2);
 	    this.bmd.dirty = true;
 	},
 
@@ -198,8 +206,17 @@ Game.prototype = {
 		this.bmd.context.strokeStyle = '#FF0000';
 		this.bmd.context.lineWidth = 1;
 		this.bmd.context.beginPath();
-		this.bmd.context.arc(planet.position.x + 300, planet.position.y, (planet.width/2)*3, 0, Math.PI*2);
+		this.bmd.context.arc(planet.position.x + 100, planet.position.y, (planet.width/2)*3, 0, Math.PI*2);
 		this.bmd.context.stroke();
+	},
+
+	changeAsteroidDirection: function() {
+		console.log("Move!");
+		this.asteroids.forEach(this.switchDirection, this);
+	},
+
+	switchDirection : function(asteroid) {
+		asteroid.body.velocity.x = this.game.physics.p2.mpxi(asteroid.body.velocity.x) * -1;
 	},
 
 	restart: function() {
