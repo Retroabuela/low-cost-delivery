@@ -60,6 +60,14 @@ Game.prototype = {
 	    this.planets.forEach(this.drawPlanetOrbit, this);
 	    this.bmd.dirty = true;
 
+	    //Create some asteroids
+	    this.asteroids = this.game.add.group();
+	    asteroid1 = this.asteroids.create(2, 2200, 'asteroid-1');
+	    asteroid2 = this.asteroids.create(42, 2000, 'asteroid-3');
+	    asteroid3 = this.asteroids.create(500, 1993, 'asteroid-2');
+
+	    this.game.physics.p2.enable([asteroid1, asteroid2, asteroid3]);
+
 	    //Add the HUD layer
 	    //this.hud = this.game.add.bitmapData(600, 800);
 	    //this.hud.context.fillStyle = '#fff';
