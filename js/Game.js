@@ -20,15 +20,19 @@ Game.prototype = {
 
 		this.load.physics('physicsData', 'assets/physics/object-shapes.json');
 		this.load.physics('stationPhysics', 'assets/physics/station.json');
-		//this.load.audio('rocket', 'assets/audio/rocket.wav');
+		
+		this.load.audio('rocket', 'assets/audio/rocket.wav');
+		this.load.audio('explosion', 'assets/audio/explosion.wav');
 	},
 
 	create : function() {
 		fuelCapacity = 100;
 		hitByAsteroid = false;
 
-		//this.rocketSound = this.game.add.audio('rocket');
-		//this.rocketSound.volume = 0.2;
+		this.rocketSound = this.game.add.audio('rocket');
+		this.rocketSound.volume = 0.3;
+		//
+		this.explosionSound = this.game.add.audio('explosion');
 
 		this.game.world.setBounds(-100 , 0, 800, 3200);
 		this.game.physics.startSystem(Phaser.Physics.P2JS);
@@ -192,7 +196,9 @@ Game.prototype = {
 		}
 
 		if(this.cursors.up.isDown) {
-			//this.rocketSound.play();
+			this.rocketSound.stop();
+			this.rocketSound.play();
+			
 			this.ship.body.thrust(200);
 			
 			if (fuelCapacity > 0) {
@@ -279,7 +285,7 @@ Game.prototype = {
 	},
 
 	hitAsteroid: function(body1, body2) {
-		//TODO: Explosion sound?
+		this.explosionSound.play();
 		hitByAsteroid = true;
 		this.state.start('Main.GameOver');
 	},
