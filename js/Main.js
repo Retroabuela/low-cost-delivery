@@ -33,6 +33,10 @@ Main.GameOver.prototype = {
      		style = { font: "30px Arial", fill: "#fff", align: "center" };
 			this.game.add.text(300 - 130, 400 - 150, "Rocket fuel burns fast.\nUse it wisely.", style);
      	}
+     	else if(hitByAsteroid) {
+     	    style = { font: "30px Arial", fill: "#fff", align: "center" };
+			this.game.add.text(300 - 160, 400 - 150, "Be careful with asteroids,\nthey might break your ship.", style);	
+     	}
 
 		style = { font: "24px Arial", fill: "#fff", align: "center" };
      	this.game.add.text(300 - 165, 750, "Press the spacebar to try again", style);

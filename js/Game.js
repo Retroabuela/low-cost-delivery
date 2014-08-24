@@ -23,17 +23,25 @@ Game.prototype = {
 
 	create : function() {
 		fuelCapacity = 100;
+		hitByAsteroid = false;
 
 		//this.rocketSound = this.game.add.audio('rocket');
 		//this.rocketSound.volume = 0.2;
 
 		this.game.world.setBounds(-100 , 0, 800, 3200);
 		this.game.physics.startSystem(Phaser.Physics.P2JS);
-		//this.game.physics.p2.defaultRestitution = 0.8;
+		//this.game.physics.p2.defaultRestitution = 0.3;
+		this.game.physics.p2.setImpactEvents(true);
+
 		this.game.physics.p2.setBoundsToWorld(true, true, true, true, false);
 
 		this.starfield = this.game.add.tileSprite(0, 0, 600, 800, 'stars');
    		this.starfield.fixedToCamera = true;
+
+		//Create collision groups
+		this.shipCollision = this.game.physics.p2.createCollisionGroup();
+		this.planetCollision = this.game.physics.p2.createCollisionGroup();
+		this.asteroidsCollision = this.game.physics.p2.createCollisionGroup();
 
 		//Bitmap data to print things
 		this.bmd = this.game.add.bitmapData(800, 3200);
@@ -46,8 +54,13 @@ Game.prototype = {
 
 		this.ship.body.clearShapes();
 		this.ship.body.loadPolygon('physicsData', 'ship');
+		this.ship.body.setCollisionGroup(this.shipCollision);
 
+		//Create planets
 		this.planets = this.game.add.group();
+		this.planets.enableBody = true;
+		this.planets.physicsBodyType = Phaser.Physics.P2JS;
+
 		planet1 = this.planets.create(150, 2800, 'planet-1');
 		planet2 = this.planets.create(450, 2400, 'planet-2');
 		planet3 = this.planets.create(215, 2000, 'planet-4');
@@ -68,6 +81,22 @@ Game.prototype = {
 		planet6.body.static = true;
 		planet7.body.static = true;
 
+		planet1.body.collides(this.shipCollision);
+		planet2.body.collides(this.shipCollision);
+		planet3.body.collides(this.shipCollision);
+		planet4.body.collides(this.shipCollision);
+		planet5.body.collides(this.shipCollision);
+		planet6.body.collides(this.shipCollision);
+		planet7.body.collides(this.shipCollision);
+
+		planet1.body.setCollisionGroup(this.planetCollision);
+		planet2.body.setCollisionGroup(this.planetCollision);
+		planet3.body.setCollisionGroup(this.planetCollision);
+		planet4.body.setCollisionGroup(this.planetCollision);
+		planet5.body.setCollisionGroup(this.planetCollision);
+		planet6.body.setCollisionGroup(this.planetCollision);
+		planet7.body.setCollisionGroup(this.planetCollision);
+
 		//Array of rotation force for each planet
 		this.rotationForce = {};
 		this.rotationForce[planet1.body.id] = -.25;
@@ -83,12 +112,24 @@ Game.prototype = {
 	    this.bmd.dirty = true;
 
 	    //Create some asteroids
+	    this.game.physics.p2.updateBoundsCollisionGroup();
+
 	    this.asteroids = this.game.add.group();
 	    asteroid1 = this.asteroids.create(550, 1500, 'asteroid-1');
 	    asteroid2 = this.asteroids.create(142, 1360, 'asteroid-3');
 	    asteroid3 = this.asteroids.create(750, 850, 'asteroid-2');
 
 	    this.game.physics.p2.enable([asteroid1, asteroid2, asteroid3]);
+
+	    asteroid1.body.setCollisionGroup(this.asteroidsCollision);
+	    asteroid2.body.setCollisionGroup(this.asteroidsCollision);
+	    asteroid3.body.setCollisionGroup(this.asteroidsCollision);
+
+	    asteroid1.body.collides(this.shipCollision, this.hitAsteroid, this);
+	    asteroid2.body.collides(this.shipCollision, this.hitAsteroid, this);
+	    asteroid3.body.collides(this.shipCollision, this.hitAsteroid, this);
+
+	    this.ship.body.collides([this.asteroidsCollision, this.planetCollision]);
 
 	    asteroid1.body.kinematic = true;
 	    asteroid2.body.kinematic = true;
@@ -211,12 +252,17 @@ Game.prototype = {
 	},
 
 	changeAsteroidDirection: function() {
-		console.log("Move!");
 		this.asteroids.forEach(this.switchDirection, this);
 	},
 
 	switchDirection : function(asteroid) {
 		asteroid.body.velocity.x = this.game.physics.p2.mpxi(asteroid.body.velocity.x) * -1;
+	},
+
+	hitAsteroid: function(body1, body2) {
+		//TODO: Explosion sound?
+		hitByAsteroid = true;
+		this.state.start('Main.GameOver');
 	},
 
 	restart: function() {
