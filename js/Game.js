@@ -16,6 +16,7 @@ Game.prototype = {
 		this.load.image('asteroid-3','assets/asteroid3.png');
 		this.load.image('stars', 'assets/starfield.png');
 		this.load.image('ship','assets/ship.png');
+		this.load.image('station','assets/station.png');
 
 		this.load.physics('physicsData', 'assets/physics/object-shapes.json');
 		//this.load.audio('rocket', 'assets/audio/rocket.wav');
@@ -42,6 +43,7 @@ Game.prototype = {
 		this.shipCollision = this.game.physics.p2.createCollisionGroup();
 		this.planetCollision = this.game.physics.p2.createCollisionGroup();
 		this.asteroidsCollision = this.game.physics.p2.createCollisionGroup();
+		this.stationCollision = this.game.physics.p2.createCollisionGroup();
 
 		//Bitmap data to print things
 		this.bmd = this.game.add.bitmapData(800, 3200);
@@ -129,7 +131,7 @@ Game.prototype = {
 	    asteroid2.body.collides(this.shipCollision, this.hitAsteroid, this);
 	    asteroid3.body.collides(this.shipCollision, this.hitAsteroid, this);
 
-	    this.ship.body.collides([this.asteroidsCollision, this.planetCollision]);
+	    this.ship.body.collides([this.asteroidsCollision, this.planetCollision, this.stationCollision]);
 
 	    asteroid1.body.kinematic = true;
 	    asteroid2.body.kinematic = true;
@@ -138,6 +140,13 @@ Game.prototype = {
 	    asteroid1.body.velocity.x = -130;
 	    asteroid2.body.velocity.x = 100;
 	    asteroid3.body.velocity.x = -250;
+
+	    //Finally, add the destination
+		station = this.game.add.sprite(75, 135, 'station');
+		this.game.physics.p2.enable(station, false);
+		station.body.static = true;
+		station.body.setCollisionGroup(this.stationCollision);
+		station.body.collides(this.shipCollision, this.arrivesStation, this);
 
 	    //Add the HUD layer
 	    var style = {font: "30px Arial", fill: "#fff"};
@@ -265,11 +274,15 @@ Game.prototype = {
 		this.state.start('Main.GameOver');
 	},
 
+	arrivesStation: function(body1, body2) {
+		this.state.start('Main.Arrived');
+	},
+
 	restart: function() {
 		this.state.restart();
 	},
 
 	outOfFuel: function() {
-		this.state.start('Main.GameOver');
+		//this.state.start('Main.GameOver');
 	} 
 };

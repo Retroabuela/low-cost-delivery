@@ -49,3 +49,22 @@ Main.GameOver.prototype = {
 		this.state.start('Game');
 	}
 };
+
+Main.Arrived = function(game) {};
+
+Main.Arrived.prototype = {
+	create: function() {
+     	style = { font: "30px Arial", fill: "#ff0", align: "center" };
+		this.game.add.text(300 - 150, 400 - 150, "The package arrived\non time. Yay!", style);
+
+		style = { font: "24px Arial", fill: "#fff", align: "center" };
+     	this.game.add.text(300 - 165, 750, "Press the spacebar to start again", style);
+
+     	startButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+		startButton.onDown.add(this.restartGame, this);
+	},
+
+	restartGame: function() {
+		this.state.start('Game');
+	}
+};
