@@ -11,7 +11,9 @@ Game.prototype = {
 		this.load.image('planet-2','assets/planet2.png');
 		this.load.image('planet-3','assets/planet3.png');
 		this.load.image('planet-4','assets/planet4.png');
-		this.load.image('asteroid','assets/asteroid.png');
+		this.load.image('asteroid-1','assets/asteroid1.png');
+		this.load.image('asteroid-2','assets/asteroid2.png');
+		this.load.image('asteroid-3','assets/asteroid3.png');
 		this.load.image('stars', 'assets/starfield.jpg');
 		this.load.image('ship','assets/ship.png');
 
@@ -63,11 +65,11 @@ Game.prototype = {
 	    //this.hud.context.fillStyle = '#fff';
 	    //this.game.add.sprite(0,0, this.hud);
 	    var style = {font: "30px Arial", fill: "#fff"};
-	    var text = this.game.add.text(450, 750, "r - Restart", style);
+	    var text = this.game.add.text(410, 750, "Esc - Restart", style);
 	    text.fixedToCamera = true;
 
 	    //Fuel indicator
-	    fuelIcon = this.game.add.sprite(550, 220, 'fuel');
+	    fuelIcon = this.game.add.sprite(550, 230, 'fuel');
 	    fuelIcon.fixedToCamera = true;
 	    
 	    this.fuelIndicator = this.game.add.graphics(0,0);
@@ -76,7 +78,7 @@ Game.prototype = {
 	    this.fuelIndicator.drawRect(560, 10, 15, 210);
 
 		this.cursors = this.game.input.keyboard.createCursorKeys();
-		restartButton = this.game.input.keyboard.addKey(Phaser.Keyboard.R);
+		restartButton = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
 		restartButton.onDown.add(this.restart, this);
 	},
 
