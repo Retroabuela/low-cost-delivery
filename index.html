@@ -1,22 +1,24 @@
 <html>
 <head>
 	<meta charset="utf-8"/>
-	<title>My LD30 Game</title>
+	<title>Planet Express</title>
 	<script src="js/phaser.min.js"></script>
+	<script src="js/Game.js"></script>
 	<script src="js/main.js"></script>
 </head>
 <body>
 	<script type="text/javascript">
 	function boot() {
-		var game = new Phaser.Game(480, 320);
+		var game = new Phaser.Game(600, 800);
 
-		game.state.add('boot', Main.Boot, true);
+		//game.state.add('boot', Main.Boot, true);
+		game.state.add('boot', Game, true);
 		//Add more states here
 	}
 
 	window.onload = function() {
 		boot();
-	}
+	};
 	</script>
 </body>
 </html>
