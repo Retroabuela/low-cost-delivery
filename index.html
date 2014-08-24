@@ -9,7 +9,7 @@
 <body>
 	<script type="text/javascript">
 	var fuelCapacity;
-	//var impact;
+	var hitByAsteroid;
 	//
 	function boot() {
 		var game = new Phaser.Game(600, 800);
@@ -17,6 +17,7 @@
 		game.state.add('Boot', Main.Boot, true);
 		game.state.add('Game', Game);
 		game.state.add('Main.GameOver', Main.GameOver);
+		game.state.add('Main.Arrived', Main.Arrived);
 		//Add more states here
 	}
 

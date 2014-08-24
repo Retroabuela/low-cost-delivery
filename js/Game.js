@@ -16,24 +16,39 @@ Game.prototype = {
 		this.load.image('asteroid-3','assets/asteroid3.png');
 		this.load.image('stars', 'assets/starfield.png');
 		this.load.image('ship','assets/ship.png');
+		this.load.image('station','assets/station.png');
 
 		this.load.physics('physicsData', 'assets/physics/object-shapes.json');
+		//this.load.audio('rocket', 'assets/audio/rocket.wav');
 	},
 
 	create : function() {
 		fuelCapacity = 100;
-		this.game.world.setBounds(0 , 0, 600, 3200);
+		hitByAsteroid = false;
+
+		//this.rocketSound = this.game.add.audio('rocket');
+		//this.rocketSound.volume = 0.2;
+
+		this.game.world.setBounds(-100 , 0, 800, 3200);
 		this.game.physics.startSystem(Phaser.Physics.P2JS);
-		//this.game.physics.p2.defaultRestitution = 0.8;
+		//this.game.physics.p2.defaultRestitution = 0.3;
+		this.game.physics.p2.setImpactEvents(true);
+
 		this.game.physics.p2.setBoundsToWorld(true, true, true, true, false);
 
 		this.starfield = this.game.add.tileSprite(0, 0, 600, 800, 'stars');
    		this.starfield.fixedToCamera = true;
 
+		//Create collision groups
+		this.shipCollision = this.game.physics.p2.createCollisionGroup();
+		this.planetCollision = this.game.physics.p2.createCollisionGroup();
+		this.asteroidsCollision = this.game.physics.p2.createCollisionGroup();
+		this.stationCollision = this.game.physics.p2.createCollisionGroup();
+
 		//Bitmap data to print things
-		this.bmd = this.game.add.bitmapData(600, 3200);
+		this.bmd = this.game.add.bitmapData(800, 3200);
 		this.bmd.context.fillStyle = '#ffffff';
-		this.game.add.sprite(0, 0, this.bmd);
+		this.game.add.sprite(-100, 0, this.bmd);
 
 		this.ship = this.game.add.sprite(300, 3150,'ship');
 		this.game.physics.p2.enable(this.ship, false);
@@ -41,37 +56,99 @@ Game.prototype = {
 
 		this.ship.body.clearShapes();
 		this.ship.body.loadPolygon('physicsData', 'ship');
+		this.ship.body.setCollisionGroup(this.shipCollision);
 
+		//Create planets
 		this.planets = this.game.add.group();
-		planet1 = this.planets.create(150, 2800, 'planet-1');
-		planet2 = this.planets.create(450, 2500, 'planet-2');
+		this.planets.enableBody = true;
+		this.planets.physicsBodyType = Phaser.Physics.P2JS;
 
-		this.game.physics.p2.enable([planet1, planet2]);
+		planet1 = this.planets.create(150, 2800, 'planet-1');
+		planet2 = this.planets.create(450, 2400, 'planet-2');
+		planet3 = this.planets.create(215, 2000, 'planet-4');
+		planet4 = this.planets.create(400, 1700, 'planet-3');
+		//Asteroid belt
+		planet5 = this.planets.create(430, 1020, 'planet-1');
+		//another asteroid
+		planet6 = this.planets.create(135, 800, 'planet-3');
+		planet7 = this.planets.create(365, 500, 'planet-2');
+
+		this.game.physics.p2.enable([planet1, planet2, planet3, planet4, planet5, planet6, planet7]);
 
 		planet1.body.static = true;
 		planet2.body.static = true;
+		planet3.body.static = true;
+		planet4.body.static = true;
+		planet5.body.static = true;
+		planet6.body.static = true;
+		planet7.body.static = true;
+
+		planet1.body.collides(this.shipCollision);
+		planet2.body.collides(this.shipCollision);
+		planet3.body.collides(this.shipCollision);
+		planet4.body.collides(this.shipCollision);
+		planet5.body.collides(this.shipCollision);
+		planet6.body.collides(this.shipCollision);
+		planet7.body.collides(this.shipCollision);
+
+		planet1.body.setCollisionGroup(this.planetCollision);
+		planet2.body.setCollisionGroup(this.planetCollision);
+		planet3.body.setCollisionGroup(this.planetCollision);
+		planet4.body.setCollisionGroup(this.planetCollision);
+		planet5.body.setCollisionGroup(this.planetCollision);
+		planet6.body.setCollisionGroup(this.planetCollision);
+		planet7.body.setCollisionGroup(this.planetCollision);
 
 		//Array of rotation force for each planet
 		this.rotationForce = {};
 		this.rotationForce[planet1.body.id] = -.25;
 		this.rotationForce[planet2.body.id] = .35;
+		this.rotationForce[planet3.body.id] = .55;
+		this.rotationForce[planet4.body.id] = .40;
+		this.rotationForce[planet5.body.id] = -.10;
+		this.rotationForce[planet6.body.id] = .15;
+		this.rotationForce[planet7.body.id] = -.20;
 
 		//Draw planet orbit
 	    this.planets.forEach(this.drawPlanetOrbit, this);
 	    this.bmd.dirty = true;
 
 	    //Create some asteroids
+	    this.game.physics.p2.updateBoundsCollisionGroup();
+
 	    this.asteroids = this.game.add.group();
-	    asteroid1 = this.asteroids.create(2, 2200, 'asteroid-1');
-	    asteroid2 = this.asteroids.create(42, 2000, 'asteroid-3');
-	    asteroid3 = this.asteroids.create(500, 1993, 'asteroid-2');
+	    asteroid1 = this.asteroids.create(550, 1500, 'asteroid-1');
+	    asteroid2 = this.asteroids.create(142, 1360, 'asteroid-3');
+	    asteroid3 = this.asteroids.create(750, 850, 'asteroid-2');
 
 	    this.game.physics.p2.enable([asteroid1, asteroid2, asteroid3]);
 
+	    asteroid1.body.setCollisionGroup(this.asteroidsCollision);
+	    asteroid2.body.setCollisionGroup(this.asteroidsCollision);
+	    asteroid3.body.setCollisionGroup(this.asteroidsCollision);
+
+	    asteroid1.body.collides(this.shipCollision, this.hitAsteroid, this);
+	    asteroid2.body.collides(this.shipCollision, this.hitAsteroid, this);
+	    asteroid3.body.collides(this.shipCollision, this.hitAsteroid, this);
+
+	    this.ship.body.collides([this.asteroidsCollision, this.planetCollision, this.stationCollision]);
+
+	    asteroid1.body.kinematic = true;
+	    asteroid2.body.kinematic = true;
+	    asteroid3.body.kinematic = true;
+
+	    asteroid1.body.velocity.x = -130;
+	    asteroid2.body.velocity.x = 100;
+	    asteroid3.body.velocity.x = -250;
+
+	    //Finally, add the destination
+		station = this.game.add.sprite(75, 135, 'station');
+		this.game.physics.p2.enable(station, false);
+		station.body.static = true;
+		station.body.setCollisionGroup(this.stationCollision);
+		station.body.collides(this.shipCollision, this.arrivesStation, this);
+
 	    //Add the HUD layer
-	    //this.hud = this.game.add.bitmapData(600, 800);
-	    //this.hud.context.fillStyle = '#fff';
-	    //this.game.add.sprite(0,0, this.hud);
 	    var style = {font: "30px Arial", fill: "#fff"};
 	    var text = this.game.add.text(410, 750, "Esc - Restart", style);
 	    text.fixedToCamera = true;
@@ -88,6 +165,8 @@ Game.prototype = {
 		this.cursors = this.game.input.keyboard.createCursorKeys();
 		restartButton = this.game.input.keyboard.addKey(Phaser.Keyboard.ESC);
 		restartButton.onDown.add(this.restart, this);
+
+		this.game.time.events.loop(Phaser.Timer.SECOND * 5, this.changeAsteroidDirection, this);
 	},
 
 	update : function() {
@@ -103,6 +182,7 @@ Game.prototype = {
 		}
 
 		if(this.cursors.up.isDown) {
+			//this.rocketSound.play();
 			this.ship.body.thrust(200);
 			
 			if (fuelCapacity > 0) {
@@ -137,7 +217,7 @@ Game.prototype = {
 
 	    //Draw trajectory line
 	    this.bmd.context.fillStyle = '#ffff00';
-	    this.bmd.context.fillRect(this.ship.body.x, this.ship.body.y, 2, 2);
+	    this.bmd.context.fillRect(this.ship.body.x + 100, this.ship.body.y, 2, 2);
 	    this.bmd.dirty = true;
 	},
 
@@ -176,8 +256,26 @@ Game.prototype = {
 		this.bmd.context.strokeStyle = '#FF0000';
 		this.bmd.context.lineWidth = 1;
 		this.bmd.context.beginPath();
-		this.bmd.context.arc(planet.position.x, planet.position.y, (planet.width/2)*3, 0, Math.PI*2);
+		this.bmd.context.arc(planet.position.x + 100, planet.position.y, (planet.width/2)*3, 0, Math.PI*2);
 		this.bmd.context.stroke();
+	},
+
+	changeAsteroidDirection: function() {
+		this.asteroids.forEach(this.switchDirection, this);
+	},
+
+	switchDirection : function(asteroid) {
+		asteroid.body.velocity.x = this.game.physics.p2.mpxi(asteroid.body.velocity.x) * -1;
+	},
+
+	hitAsteroid: function(body1, body2) {
+		//TODO: Explosion sound?
+		hitByAsteroid = true;
+		this.state.start('Main.GameOver');
+	},
+
+	arrivesStation: function(body1, body2) {
+		this.state.start('Main.Arrived');
 	},
 
 	restart: function() {
@@ -185,6 +283,6 @@ Game.prototype = {
 	},
 
 	outOfFuel: function() {
-		this.state.start('Main.GameOver');
+		//this.state.start('Main.GameOver');
 	} 
 };
